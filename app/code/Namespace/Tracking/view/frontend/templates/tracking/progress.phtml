@@ -1,0 +1,48 @@
+<?php
+/**
+* Copyright © Magento, Inc. All rights reserved.
+* See COPYING.txt for license details.
+*/
+
+// @codingStandardsIgnoreFile
+
+/** @var $block \Magento\Framework\View\Element\Template */
+$parentBlock = $block->getParentBlock();
+$track = $block->getData('track');
+$number = is_object($track) ? $track->getTracking() : $track['number'];
+$shippingData = $parentBlock->track($number);
+if(isset($shippingData['data'])):
+?>
+<div class="table-wrapper">
+    <table class="data table order tracking" id="track-history-table-<?= $block->escapeHtml($number) ?>">
+        <caption class="table-caption"><?= $block->escapeHtml(__('Track history')) ?></caption>
+        <thead>
+        <tr>
+            <th class="col location" scope="col"><?= $block->escapeHtml(__('Location')) ?></th>
+            <th class="col date" scope="col"><?= $block->escapeHtml(__('Date')) ?></th>
+            <th class="col time" scope="col"><?= $block->escapeHtml(__('Local Time')) ?></th>
+            <th class="col description" scope="col"><?= $block->escapeHtml(__('Description')) ?></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($shippingData['data']['events'] as $detail): ?>
+            <?php $detailDate = (!empty($detail['Time']) ? $parentBlock->formatDeliveryDate($detail['Time']) : '');?>
+            <?php $detailTime = (!empty($detail['Time']) ? $parentBlock->formatDeliveryTime($detail['Time']) : '');?>
+            <tr>
+                <td data-th="<?= $block->escapeHtml(__('Location')) ?>" class="col location">
+                    <?= (!empty($detail['Location']) ? $block->escapeHtml($detail['Location']) : '') ?>
+                </td>
+                <td data-th="<?= $block->escapeHtml(__('Date')) ?>" class="col date">
+                    <?= /* @noEscape */ $detailDate ?>
+                </td>
+                <td data-th="<?= $block->escapeHtml(__('Local Time')) ?>" class="col time">
+                    <?= /* @noEscape */ $detailTime ?></td>
+                <td data-th="<?= $block->escapeHtml(__('Description')) ?>" class="col description">
+                    <?= (!empty($detail['Remarks']) ? $block->escapeHtml($detail['Remarks']) : '') ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+<?php endif; ?>
